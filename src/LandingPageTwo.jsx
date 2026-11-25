@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { products } from "./App.jsx";
+import { useShopStore } from "./ShopStore.jsx";
 
 const imageUrl = (id, width = 700) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=82`;
@@ -74,6 +75,32 @@ const headerCategories = [
   ["Electric Vehicle Parts", "photo-1509391366360-2e959784a276"],
 ];
 
+const categorySlugs = {
+  "Development Boards": "development-boards",
+  "Drone Parts": "drone-parts",
+  "Batteries, Power Supply and Accessories": "batteries-power-supply-and-accessories",
+  "3D Printers and Parts": "3d-printers-and-parts",
+  Sensors: "sensors",
+  "Electronic Components": "electronic-components",
+  "Motors | Drivers | Pumps | Actuators": "motors-actuators",
+  "Electronic Modules and Displays": "electronic-modules-and-displays",
+  "IoT and Wireless Modules": "iot-and-wireless-modules",
+  "Mechanical Parts, Measurement & Workbench Tools": "mechanical-parts-measurement-workbench-tools",
+  "DIY and Maker Kits": "diy-maker-kits",
+  "Electric Vehicle Parts": "electric-vehicle-parts",
+};
+
+const homeCategorySlugs = {
+  "Development Boards": "development-boards",
+  "Robotics & IoT": "robotics-iot",
+  "Electronic Components": "electronic-components",
+  Sensors: "sensors",
+  "Motors & Actuators": "motors-actuators",
+  "Tools & Equipment": "tools-equipment",
+  "Power & Batteries": "batteries-power-supply-and-accessories",
+  "Maker Kits": "diy-maker-kits",
+};
+
 const services = [
   ["01", "Fast Shipping", "Carefully packed orders dispatched across India."],
   ["02", "Secure Payments", "Multiple trusted payment options at checkout."],
@@ -111,6 +138,29 @@ const blogs = [
   ["Your first Arduino project", "Learn the essentials with a simple step-by-step build.", "TUTORIAL", "photo-1581091226825-a6a2a5aee158"],
 ];
 
+const tutorials = [
+  {
+    title: "Arduino: Build your first LED project",
+    image: "photo-1581091226825-a6a2a5aee158",
+    href: "https://docs.arduino.cc/built-in-examples/basics/Blink/",
+  },
+  {
+    title: "Raspberry Pi: Explore beginner projects",
+    image: "photo-1597733336794-12d05021d510",
+    href: "https://projects.raspberrypi.org/en/projects",
+  },
+  {
+    title: "ESP32: Get started with connected builds",
+    image: "photo-1558002038-1055907df827",
+    href: "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html",
+  },
+  {
+    title: "IoT: Connect a sensor to Adafruit IO",
+    image: "photo-1519389950473-47ba0277781c",
+    href: "https://learn.adafruit.com/adafruit-io-basics-esp8266-arduino",
+  },
+];
+
 function Icon({ name, size = 20 }) {
   const icons = {
     search: "⌕",
@@ -140,6 +190,7 @@ function HeaderIcon({ name }) {
     check: <><path d="M12 3 19 6v5c0 4.6-3 8-7 10-4-2-7-5.4-7-10V6l7-3Z" /><path d="m9 12 2 2 4-4" /></>,
     truck: <><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z" /><circle cx="7.5" cy="19" r="1.5" /><circle cx="17.5" cy="19" r="1.5" /></>,
     support: <><path d="M4 13v-2a8 8 0 0 1 16 0v2" /><path d="M4 13h3v6H6a2 2 0 0 1-2-2v-4ZM20 13h-3v6h1a2 2 0 0 0 2-2v-4ZM17 20c-1 1-2.5 1-4 1" /></>,
+    package: <><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Z" /><path d="m3 7 9 4 9-4M12 11v10M7.5 5l9 4" /></>,
   };
   return <svg className="l2-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
@@ -153,11 +204,12 @@ function Brand() {
   );
 }
 
-function Header() {
+export function Header() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(headerCategories[0][0]);
   const categoriesRef = useRef(null);
+  const { cartCount, wishlistCount } = useShopStore();
 
   return (
     <header className="l2-header">
@@ -181,8 +233,8 @@ function Header() {
         <div className="l2-header__actions">
           <label className="l2-location"><HeaderIcon name="location" /><select aria-label="Select location" defaultValue=""><option value="" disabled>Select Location</option><option>Delhi NCR</option><option>Mumbai</option><option>Bengaluru</option><option>Other location</option></select><HeaderIcon name="chevron" /></label>
           <a className="l2-header-action l2-notification" href="#support" aria-label="Notifications"><HeaderIcon name="bell" /></a>
-          <a className="l2-header-action" href="#wishlist" aria-label="Wishlist"><HeaderIcon name="heart" /><span>Wishlist</span></a>
-          <a className="l2-header-action l2-cart" href="#cart" aria-label="Cart, 0 items"><HeaderIcon name="cart" /><span>Cart</span><b>0</b></a>
+          <a className="l2-header-action" href="/wishlist" aria-label={`Wishlist, ${wishlistCount} ${wishlistCount === 1 ? "item" : "items"}`}><HeaderIcon name="heart" /><span>Wishlist</span>{wishlistCount > 0 && <b className="l2-header-count">{wishlistCount}</b>}</a>
+          <a className="l2-header-action l2-cart" href="/cart" aria-label={`Cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}><HeaderIcon name="cart" /><span>Cart</span>{cartCount > 0 && <b>{cartCount}</b>}</a>
           <div className="l2-more">
             <button type="button" className="l2-header-action l2-more__toggle" aria-label="More options" aria-expanded={moreOpen} onClick={() => setMoreOpen((open) => !open)}>More <HeaderIcon name="chevron" /></button>
             {moreOpen && <div className="l2-more__menu"><a href="#categories" onClick={() => setMoreOpen(false)}>All categories</a><a href="#products" onClick={() => setMoreOpen(false)}>Featured products</a><a href="#support" onClick={() => setMoreOpen(false)}>Customer support</a></div>}
@@ -195,7 +247,7 @@ function Header() {
           <button className="l2-category-nav__arrow" type="button" aria-label="Scroll categories left" onClick={() => categoriesRef.current?.scrollBy({ left: -360, behavior: "smooth" })}><HeaderIcon name="left" /></button>
           <div className="l2-category-nav__scroller" ref={categoriesRef}>
             {headerCategories.map(([name, image]) => (
-              <a className={`l2-category-item${activeCategory === name ? " is-active" : ""}`} href="#products" key={name} title={name} aria-current={activeCategory === name ? "true" : undefined} onClick={() => setActiveCategory(name)}>
+              <a className={`l2-category-item${activeCategory === name ? " is-active" : ""}`} href={`/category/${categorySlugs[name]}`} key={name} title={name} aria-current={activeCategory === name ? "true" : undefined} onClick={() => setActiveCategory(name)}>
                 <span className="l2-category-item__image"><img src={imageUrl(image, 160)} alt="" loading="lazy" /></span>
                 <span className="l2-category-item__name">{name}</span>
               </a>
@@ -302,7 +354,7 @@ function CategorySection() {
         <SectionHeading eyebrow="SHOP BY CATEGORY" title="Everything you need to build" />
         <div className="l2-category-grid">
           {categories.map(([title, subtitle, image]) => (
-            <a className="l2-category-card" href="#products" key={title}>
+            <a className="l2-category-card" href={`/category/${homeCategorySlugs[title]}`} key={title}>
               <div><img src={imageUrl(image, 480)} alt="" loading="lazy" /></div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
@@ -314,21 +366,23 @@ function CategorySection() {
   );
 }
 
-function ProductCard({ product }) {
+export function ProductCard({ product }) {
+  const { addToCart, toggleWishlist, wishlist } = useShopStore();
+  const isSaved = wishlist.some((item) => item.id === product.id);
   return (
     <article className="l2-product">
       <div className="l2-product__media">
-        <img src={imageUrl(product.image)} alt={product.name} loading="lazy" />
+        <a href={`/product/${product.id}`} aria-label={`View ${product.name}`}><img src={imageUrl(product.image)} alt={product.name} loading="lazy" /></a>
         {product.badge && <span>{product.badge}</span>}
-        <button type="button" aria-label={`Add ${product.name} to wishlist`}>♡</button>
+        <button type="button" aria-label={`${isSaved ? "Remove" : "Add"} ${product.name} ${isSaved ? "from" : "to"} wishlist`} aria-pressed={isSaved} onClick={() => toggleWishlist(product)}>{isSaved ? "♥" : "♡"}</button>
       </div>
       <div className="l2-product__body">
         <p>{product.category}</p>
-        <h3>{product.name}</h3>
+        <h3><a href={`/product/${product.id}`}>{product.name}</a></h3>
         <div className="l2-product__rating"><span>★★★★★</span><small>{product.reviews} reviews</small></div>
         <div className="l2-product__buy">
           <div><strong>{rupees(product.price)}</strong>{product.oldPrice && <del>{rupees(product.oldPrice)}</del>}</div>
-          <button type="button" aria-label={`Add ${product.name} to cart`}>Add to cart</button>
+          <button type="button" aria-label={`Add ${product.name} to cart`} onClick={() => addToCart(product)}>Add to cart</button>
         </div>
       </div>
     </article>
@@ -451,17 +505,27 @@ function BlogsAndTutorials() {
           </div>
         </div>
       </section>
-      <section className="l2-tutorials" id="tutorials">
-        <div className="l2-shell l2-tutorials__inner">
-          <div><p>MITRA TUTORIALS</p><h2>Learn by making.</h2><span>Guides, projects and practical answers for every stage of your build.</span></div>
-          <a className="l2-button l2-button--dark" href="#products">Browse tutorials <Icon name="arrow" /></a>
+      <section className="l2-section l2-tutorials" id="tutorials">
+        <div className="l2-shell">
+          <div className="l2-tutorials__header">
+            <div><p>LEARN &amp; MAKE</p><h2>Tutorials</h2></div>
+            <a href="https://learn.adafruit.com/" target="_blank" rel="noreferrer">View All <HeaderIcon name="right" /></a>
+          </div>
+          <div className="l2-tutorial-grid">
+            {tutorials.map((tutorial) => (
+              <a className="l2-tutorial-card" href={tutorial.href} target="_blank" rel="noreferrer" key={tutorial.title}>
+                <span className="l2-tutorial-card__image"><img src={imageUrl(tutorial.image, 720)} alt="" loading="lazy" /></span>
+                <h3>{tutorial.title}</h3>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
     </>
   );
 }
 
-function Footer() {
+export function Footer() {
   return (
     <footer className="l2-footer">
       <div className="l2-shell">
@@ -556,6 +620,27 @@ function FeaturedBrands() {
   );
 }
 
+function ShoppingBenefits() {
+  const benefits = [
+    ["truck", "Same Day Shipping"],
+    ["support", "Dedicated Customer Service"],
+    ["package", "140+ Brands"],
+  ];
+
+  return (
+    <section className="l2-shopping-benefits" aria-label="Shopping benefits">
+      <div className="l2-shell l2-shopping-benefits__grid">
+        {benefits.map(([icon, title]) => (
+          <article className="l2-shopping-benefit" key={title}>
+            <HeaderIcon name={icon} />
+            <h2>{title}</h2>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPageTwo() {
   return (
     <div className="l2-page" id="top">
@@ -569,6 +654,7 @@ export default function LandingPageTwo() {
         <GoogleReviews />
         <PromoSlider />
         <BlogsAndTutorials />
+        <ShoppingBenefits />
         <FeaturedBrands />
       </main>
       <Footer />

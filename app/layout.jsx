@@ -1,5 +1,7 @@
 import "../styles.css";
 import "../landing-page-two.css";
+import "../shop-pages.css";
+import { ShopStoreProvider } from "../src/ShopStore.jsx";
 
 export const metadata = {
   title: "Mitra Shop — Ideas into reality",
@@ -7,7 +9,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#f4f7f6",
+  themeColor: "#f8f6ff",
 };
 
 export default function RootLayout({ children }) {
@@ -18,7 +20,7 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body id="top">{children}</body>
+      <body id="top"><ShopStoreProvider>{children}</ShopStoreProvider></body>
     </html>
   );
 }

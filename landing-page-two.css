@@ -63,7 +63,7 @@
 .l2-location > .l2-header-icon:first-child { width: 17px; color: var(--l2-green); }
 .l2-location > .l2-header-icon:last-child { width: 13px; color: #786c91; }
 .l2-location select { max-width: 96px; border: 0; outline: 0; color: inherit; background: transparent; font-size: 11px; }
-.l2-cart b { position: absolute; top: -5px; right: -4px; display: grid; width: 15px; height: 15px; place-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; background: var(--l2-green); font-size: 8px; }
+.l2-header-action > b { position: absolute; top: -5px; right: -4px; display: grid; min-width: 17px; height: 17px; place-items: center; border: 2px solid #fff; border-radius: 50%; padding: 0 3px; color: #fff; background: var(--l2-theme-primary); font-size: 8px; line-height: 1; }
 .l2-more { position: relative; }
 .l2-more__menu { position: absolute; z-index: 5; top: calc(100% + 6px); right: 0; width: 175px; display: flex; flex-direction: column; border: 1px solid var(--l2-border); border-radius: 6px; padding: 5px; background: #fff; box-shadow: 0 12px 28px rgba(38,0,102,.13); }
 .l2-more__menu a { border-radius: 4px; padding: 10px; color: #4a3f63; font-size: 11px; }
@@ -229,13 +229,26 @@
 .l2-blog-grid p { min-height: 38px; margin: 0 0 12px; color: #716887; font-size: 10px; line-height: 1.7; }
 .l2-blog-grid article > div > a { display: inline-flex; align-items: center; gap: 8px; color: var(--l2-green); font-size: 9px; font-weight: 800; }
 .l2-blog-grid article > div > a:hover { color: var(--l2-theme-accent); }
-.l2-tutorials { color: #fff; background: var(--l2-theme-primary); }
-.l2-tutorials__inner { min-height: 210px; display: flex; align-items: center; justify-content: space-between; }
-.l2-tutorials p { margin: 0 0 8px; color: #d6c6ff; font-size: 9px; font-weight: 800; letter-spacing: .15em; }
-.l2-tutorials h2 { margin: 0 0 7px; font-family: "Manrope", sans-serif; font-size: 38px; letter-spacing: -.04em; }
-.l2-tutorials span { color: #eee8ff; font-size: 12px; }
-.l2-tutorials .l2-button { color: var(--l2-theme-deep); background: var(--l2-theme-surface); }
-.l2-tutorials .l2-button:hover { background: var(--l2-theme-lavender); }
+.l2-tutorials { background: var(--l2-theme-surface); }
+.l2-tutorials__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.l2-tutorials__header p { margin: 0 0 6px; color: var(--l2-theme-accent); font-size: 9px; font-weight: 800; letter-spacing: .15em; }
+.l2-tutorials__header h2 { margin: 0; color: var(--l2-theme-deep); font-family: "Manrope", sans-serif; font-size: 25px; font-weight: 800; letter-spacing: -.035em; }
+.l2-tutorials__header > a { min-height: 38px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--l2-theme-border); border-radius: 8px; padding: 0 12px; color: var(--l2-theme-primary); background: #fff; font-size: 11px; font-weight: 800; transition: border-color .2s, background .2s; }
+.l2-tutorials__header > a:hover { color: var(--l2-theme-accent); }
+.l2-tutorials__header > a .l2-header-icon { width: 15px; height: 15px; }
+.l2-tutorial-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.l2-tutorial-card { min-width: 0; color: var(--l2-theme-deep); text-decoration: none; }
+.l2-tutorial-card__image { display: block; overflow: hidden; aspect-ratio: 1.48; border-radius: 12px; background: var(--l2-theme-lavender); }
+.l2-tutorial-card__image img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .3s ease; }
+.l2-tutorial-card:hover .l2-tutorial-card__image img { transform: scale(1.045); }
+.l2-tutorial-card h3 { margin: 11px 0 0; color: var(--l2-theme-deep); font-family: "Manrope", sans-serif; font-size: 13px; font-weight: 800; line-height: 1.45; transition: color .2s; }
+.l2-tutorial-card:hover h3 { color: var(--l2-theme-accent); }
+.l2-tutorial-card:focus-visible, .l2-tutorials__header > a:focus-visible { outline: 2px solid var(--l2-theme-accent); outline-offset: 4px; }
+.l2-shopping-benefits { padding: 30px 0; background: var(--l2-theme-lavender); }
+.l2-shopping-benefits__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.l2-shopping-benefit { min-height: 124px; display: flex; align-items: center; justify-content: center; gap: 16px; border: 1px solid rgba(57,0,154,.09); border-radius: 14px; padding: 20px; background: rgba(255,255,255,.82); }
+.l2-shopping-benefit > .l2-header-icon { width: 42px; height: 42px; flex: none; color: var(--l2-theme-deep); }
+.l2-shopping-benefit h2 { margin: 0; color: var(--l2-theme-deep); font-family: "Manrope", sans-serif; font-size: 15px; font-weight: 800; line-height: 1.35; }
 
 .l2-footer { color: #e3dcf1; background: var(--l2-theme-deep); }
 .l2-footer__top { display: grid; grid-template-columns: 1.6fr repeat(3, .8fr) 1.35fr; gap: 38px; padding: 55px 0 42px; }
@@ -282,6 +295,9 @@
   .l2-services__grid { grid-template-columns: repeat(2, 1fr); }
   .l2-services__grid article:nth-child(2) { border-right: 0; }
   .l2-services__grid article:nth-child(-n+2) { border-bottom: 1px solid var(--l2-theme-border); }
+  .l2-tutorial-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .l2-shopping-benefits__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .l2-shopping-benefit:last-child { grid-column: 1 / -1; }
   .l2-reviews__inner { gap: 30px; }
   .l2-footer__top { grid-template-columns: 1.4fr repeat(2, 1fr); }
   .l2-footer__newsletter { grid-column: 2 / -1; }
@@ -382,8 +398,16 @@
   .l2-video-grid { grid-template-columns: 1fr; gap: 22px; }
   .l2-video-grid article > div { height: 220px; }
   .l2-blog-grid { grid-template-columns: 1fr; }
-  .l2-tutorials__inner { min-height: 230px; align-items: flex-start; flex-direction: column; justify-content: center; gap: 22px; }
-  .l2-tutorials h2 { font-size: 32px; }
+  .l2-tutorials__header { margin-bottom: 16px; }
+  .l2-tutorials__header h2 { font-size: 23px; }
+  .l2-tutorial-grid { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .l2-tutorial-grid::-webkit-scrollbar { display: none; }
+  .l2-tutorial-card { flex: 0 0 min(78vw, 300px); scroll-snap-align: start; }
+  .l2-shopping-benefits { padding: 24px 0; }
+  .l2-shopping-benefits__grid { grid-template-columns: 1fr; gap: 10px; }
+  .l2-shopping-benefit, .l2-shopping-benefit:last-child { min-height: 94px; grid-column: auto; justify-content: flex-start; padding: 16px 18px; }
+  .l2-shopping-benefit > .l2-header-icon { width: 36px; height: 36px; }
+  .l2-shopping-benefit h2 { font-size: 14px; }
   .l2-footer__top { grid-template-columns: 1fr 1fr; gap: 28px 20px; padding: 40px 0 30px; }
   .l2-footer__brand { grid-column: 1 / -1; }
   .l2-footer__newsletter { grid-column: 1 / -1; }
