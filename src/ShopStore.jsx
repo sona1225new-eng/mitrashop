@@ -129,6 +129,9 @@ export function ShopStoreProvider({ children }) {
       setWishlist((items) => items.some((item) => item.id === product.id) ? items : [...items, product]);
       setToast(`${product.name} saved for later.`);
     },
+    clearCart() {
+      setCart([]);
+    },
   }), [cart, wishlist]);
 
   return (

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { products } from "./App.jsx";
 import { useShopStore } from "./ShopStore.jsx";
+import { pdfCategories } from "./categoriesData.js";
 
 const imageUrl = (id, width = 700) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=82`;
@@ -207,9 +208,36 @@ function Brand() {
 export function Header() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState(headerCategories[0][0]);
+  const [activeCategory, setActiveCategory] = useState(pdfCategories[0].slug);
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [activeMenuIndex, setActiveMenuIndex] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedMobileCat, setExpandedMobileCat] = useState(null);
   const categoriesRef = useRef(null);
+  const megaMenuRef = useRef(null);
   const { cartCount, wishlistCount } = useShopStore();
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (megaMenuRef.current && !megaMenuRef.current.contains(event.target)) {
+        setMegaMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMegaMenuOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+    if (megaMenuOpen || mobileMenuOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [megaMenuOpen, mobileMenuOpen]);
 
   return (
     <header className="l2-header">
@@ -237,25 +265,224 @@ export function Header() {
           <a className="l2-header-action l2-cart" href="/cart" aria-label={`Cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}><HeaderIcon name="cart" /><span>Cart</span>{cartCount > 0 && <b>{cartCount}</b>}</a>
           <div className="l2-more">
             <button type="button" className="l2-header-action l2-more__toggle" aria-label="More options" aria-expanded={moreOpen} onClick={() => setMoreOpen((open) => !open)}>More <HeaderIcon name="chevron" /></button>
-            {moreOpen && <div className="l2-more__menu"><a href="#categories" onClick={() => setMoreOpen(false)}>All categories</a><a href="#products" onClick={() => setMoreOpen(false)}>Featured products</a><a href="#support" onClick={() => setMoreOpen(false)}>Customer support</a></div>}
+            {moreOpen && <div className="l2-more__menu"><a href="#categories" onClick={() => setMoreOpen(false)}>All categories</a><a href="/checkout" onClick={() => setMoreOpen(false)}>Checkout</a><a href="#products" onClick={() => setMoreOpen(false)}>Featured products</a><a href="#support" onClick={() => setMoreOpen(false)}>Customer support</a></div>}
           </div>
           <a className="l2-login" href="#account" aria-label="Login / Sign In"><HeaderIcon name="user" /><span>Login / Sign In</span></a>
         </div>
       </div>
+
+      {/* Image-Based Category Navigation Bar with Circular Images + All Categories Dropdown */}
       <nav className="l2-category-nav" aria-label="Product categories">
         <div className="l2-shell l2-category-nav__inner">
-          <button className="l2-category-nav__arrow" type="button" aria-label="Scroll categories left" onClick={() => categoriesRef.current?.scrollBy({ left: -360, behavior: "smooth" })}><HeaderIcon name="left" /></button>
+          {/* All Categories Mega Menu Trigger */}
+          <div className="l2-mega-dropdown" ref={megaMenuRef}>
+            <button
+              type="button"
+              className={`l2-all-categories-btn ${megaMenuOpen ? "is-open" : ""}`}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  setMobileMenuOpen(true);
+                } else {
+                  setMegaMenuOpen((prev) => !prev);
+                }
+              }}
+              aria-expanded={megaMenuOpen}
+              aria-haspopup="true"
+            >
+              <span className="l2-all-categories-btn__icon">☰</span>
+              <span className="l2-all-categories-btn__text">All Categories</span>
+              <span className="l2-all-categories-btn__arrow">{megaMenuOpen ? "▴" : "▾"}</span>
+            </button>
+
+            {/* Desktop Mega Menu Dropdown */}
+            {megaMenuOpen && (
+              <div className="l2-mega-menu" role="menu">
+                <div className="l2-mega-menu__header">
+                  <div className="l2-mega-menu__header-title">
+                    <strong>Mitra Shop Catalog</strong>
+                    <span>16 Official Departments &amp; Sub-Menus</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="l2-mega-menu__close"
+                    onClick={() => setMegaMenuOpen(false)}
+                    aria-label="Close menu"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="l2-mega-menu__body">
+                  {/* Left Column: 16 Main Categories with Image Thumbnails */}
+                  <div className="l2-mega-menu__sidebar">
+                    {pdfCategories.map((cat, idx) => (
+                      <a
+                        key={cat.id}
+                        href={`/category/${cat.slug}`}
+                        className={`l2-mega-menu__side-item ${activeMenuIndex === idx ? "is-active" : ""}`}
+                        onMouseEnter={() => setActiveMenuIndex(idx)}
+                        onClick={() => setMegaMenuOpen(false)}
+                      >
+                        <img
+                          src={imageUrl(cat.image, 80)}
+                          alt=""
+                          className="l2-mega-menu__cat-thumb"
+                        />
+                        <span className="l2-mega-menu__cat-name">{cat.name}</span>
+                        <span className="l2-mega-menu__side-arrow">›</span>
+                      </a>
+                    ))}
+                  </div>
+
+                  {/* Right Content Area: Subcategories of currently hovered/active category */}
+                  <div className="l2-mega-menu__content">
+                    {pdfCategories[activeMenuIndex] && (
+                      <>
+                        <div className="l2-mega-menu__content-top">
+                          <div className="l2-mega-menu__banner-preview">
+                            <img
+                              src={imageUrl(pdfCategories[activeMenuIndex].image, 240)}
+                              alt=""
+                              className="l2-mega-menu__banner-thumb"
+                            />
+                            <div>
+                              <h3>{pdfCategories[activeMenuIndex].name}</h3>
+                              <p>{pdfCategories[activeMenuIndex].description}</p>
+                            </div>
+                          </div>
+                          <a
+                            href={`/category/${pdfCategories[activeMenuIndex].slug}`}
+                            className="l2-mega-menu__view-all"
+                            onClick={() => setMegaMenuOpen(false)}
+                          >
+                            Explore All in {pdfCategories[activeMenuIndex].name} →
+                          </a>
+                        </div>
+                        <div className="l2-mega-menu__subgrid">
+                          {pdfCategories[activeMenuIndex].subcategories.map((sub) => (
+                            <a
+                              key={sub.slug}
+                              href={`/category/${sub.slug}`}
+                              className="l2-mega-sublink"
+                              onClick={() => setMegaMenuOpen(false)}
+                            >
+                              <span>{sub.name}</span>
+                              <small>View ›</small>
+                            </a>
+                          ))}
+                          {pdfCategories[activeMenuIndex].subcategories.length === 0 && (
+                            <p className="l2-mega-no-sub">Direct product department without secondary sub-menus.</p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Left Arrow for image scroller */}
+          <button
+            className="l2-category-nav__arrow"
+            type="button"
+            aria-label="Scroll categories left"
+            onClick={() => categoriesRef.current?.scrollBy({ left: -360, behavior: "smooth" })}
+          >
+            <HeaderIcon name="left" />
+          </button>
+
+          {/* Preserved Image-Based Category Scroller (Circular Image + Name Below) */}
           <div className="l2-category-nav__scroller" ref={categoriesRef}>
-            {headerCategories.map(([name, image]) => (
-              <a className={`l2-category-item${activeCategory === name ? " is-active" : ""}`} href={`/category/${categorySlugs[name]}`} key={name} title={name} aria-current={activeCategory === name ? "true" : undefined} onClick={() => setActiveCategory(name)}>
-                <span className="l2-category-item__image"><img src={imageUrl(image, 160)} alt="" loading="lazy" /></span>
-                <span className="l2-category-item__name">{name}</span>
+            {pdfCategories.map((cat) => (
+              <a
+                className={`l2-category-item${activeCategory === cat.slug ? " is-active" : ""}`}
+                href={`/category/${cat.slug}`}
+                key={cat.slug}
+                title={cat.name}
+                aria-current={activeCategory === cat.slug ? "true" : undefined}
+                onClick={() => setActiveCategory(cat.slug)}
+              >
+                <span className="l2-category-item__image">
+                  <img src={imageUrl(cat.image, 160)} alt={cat.name} loading="lazy" />
+                </span>
+                <span className="l2-category-item__name">{cat.name}</span>
               </a>
             ))}
           </div>
-          <button className="l2-category-nav__arrow" type="button" aria-label="Scroll categories right" onClick={() => categoriesRef.current?.scrollBy({ left: 360, behavior: "smooth" })}><HeaderIcon name="right" /></button>
+
+          {/* Right Arrow for image scroller */}
+          <button
+            className="l2-category-nav__arrow"
+            type="button"
+            aria-label="Scroll categories right"
+            onClick={() => categoriesRef.current?.scrollBy({ left: 360, behavior: "smooth" })}
+          >
+            <HeaderIcon name="right" />
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Categories Slide-out Drawer */}
+      {mobileMenuOpen && (
+        <div className="l2-mobile-drawer-backdrop" onClick={() => setMobileMenuOpen(false)}>
+          <div className="l2-mobile-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="l2-mobile-drawer__header">
+              <h3>All Product Categories</h3>
+              <button
+                type="button"
+                className="l2-mobile-drawer__close"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close categories menu"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="l2-mobile-drawer__content">
+              {pdfCategories.map((cat) => {
+                const isExpanded = expandedMobileCat === cat.id;
+                return (
+                  <div className="l2-mobile-cat-group" key={cat.id}>
+                    <div className="l2-mobile-cat-header">
+                      <a
+                        href={`/category/${cat.slug}`}
+                        className="l2-mobile-cat-link"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <img src={imageUrl(cat.image, 60)} alt="" className="l2-mobile-cat-thumb" />
+                        <span><b className="l2-mobile-cat-num">{cat.id}.</b> {cat.name}</span>
+                      </a>
+                      {cat.subcategories.length > 0 && (
+                        <button
+                          type="button"
+                          className="l2-mobile-expand-btn"
+                          onClick={() => setExpandedMobileCat(isExpanded ? null : cat.id)}
+                          aria-label={isExpanded ? "Collapse" : "Expand"}
+                        >
+                          {isExpanded ? "−" : "+"}
+                        </button>
+                      )}
+                    </div>
+                    {isExpanded && cat.subcategories.length > 0 && (
+                      <div className="l2-mobile-subcat-list">
+                        {cat.subcategories.map((sub) => (
+                          <a
+                            key={sub.slug}
+                            href={`/category/${sub.slug}`}
+                            className="l2-mobile-subcat-link"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {sub.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
