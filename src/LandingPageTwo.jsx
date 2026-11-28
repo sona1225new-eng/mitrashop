@@ -210,7 +210,6 @@ export function Header() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(pdfCategories[0].slug);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
-  const [activeMenuIndex, setActiveMenuIndex] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMobileCat, setExpandedMobileCat] = useState(null);
   const categoriesRef = useRef(null);
@@ -294,13 +293,13 @@ export function Header() {
               <span className="l2-all-categories-btn__arrow">{megaMenuOpen ? "▴" : "▾"}</span>
             </button>
 
-            {/* Desktop Mega Menu Dropdown */}
+            {/* Desktop All Categories Dropdown */}
             {megaMenuOpen && (
               <div className="l2-mega-menu" role="menu">
                 <div className="l2-mega-menu__header">
                   <div className="l2-mega-menu__header-title">
-                    <strong>Mitra Shop Catalog</strong>
-                    <span>16 Official Departments &amp; Sub-Menus</span>
+                    <strong>All Categories</strong>
+                    <span>16 Departments</span>
                   </div>
                   <button
                     type="button"
@@ -311,71 +310,23 @@ export function Header() {
                     ✕
                   </button>
                 </div>
-                <div className="l2-mega-menu__body">
-                  {/* Left Column: 16 Main Categories with Image Thumbnails */}
-                  <div className="l2-mega-menu__sidebar">
-                    {pdfCategories.map((cat, idx) => (
-                      <a
-                        key={cat.id}
-                        href={`/category/${cat.slug}`}
-                        className={`l2-mega-menu__side-item ${activeMenuIndex === idx ? "is-active" : ""}`}
-                        onMouseEnter={() => setActiveMenuIndex(idx)}
-                        onClick={() => setMegaMenuOpen(false)}
-                      >
-                        <img
-                          src={imageUrl(cat.image, 80)}
-                          alt=""
-                          className="l2-mega-menu__cat-thumb"
-                        />
-                        <span className="l2-mega-menu__cat-name">{cat.name}</span>
-                        <span className="l2-mega-menu__side-arrow">›</span>
-                      </a>
-                    ))}
-                  </div>
-
-                  {/* Right Content Area: Subcategories of currently hovered/active category */}
-                  <div className="l2-mega-menu__content">
-                    {pdfCategories[activeMenuIndex] && (
-                      <>
-                        <div className="l2-mega-menu__content-top">
-                          <div className="l2-mega-menu__banner-preview">
-                            <img
-                              src={imageUrl(pdfCategories[activeMenuIndex].image, 240)}
-                              alt=""
-                              className="l2-mega-menu__banner-thumb"
-                            />
-                            <div>
-                              <h3>{pdfCategories[activeMenuIndex].name}</h3>
-                              <p>{pdfCategories[activeMenuIndex].description}</p>
-                            </div>
-                          </div>
-                          <a
-                            href={`/category/${pdfCategories[activeMenuIndex].slug}`}
-                            className="l2-mega-menu__view-all"
-                            onClick={() => setMegaMenuOpen(false)}
-                          >
-                            Explore All in {pdfCategories[activeMenuIndex].name} →
-                          </a>
-                        </div>
-                        <div className="l2-mega-menu__subgrid">
-                          {pdfCategories[activeMenuIndex].subcategories.map((sub) => (
-                            <a
-                              key={sub.slug}
-                              href={`/category/${sub.slug}`}
-                              className="l2-mega-sublink"
-                              onClick={() => setMegaMenuOpen(false)}
-                            >
-                              <span>{sub.name}</span>
-                              <small>View ›</small>
-                            </a>
-                          ))}
-                          {pdfCategories[activeMenuIndex].subcategories.length === 0 && (
-                            <p className="l2-mega-no-sub">Direct product department without secondary sub-menus.</p>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                <div className="l2-mega-menu__sidebar">
+                  {pdfCategories.map((cat) => (
+                    <a
+                      key={cat.id}
+                      href={`/category/${cat.slug}`}
+                      className="l2-mega-menu__side-item"
+                      onClick={() => setMegaMenuOpen(false)}
+                    >
+                      <img
+                        src={imageUrl(cat.image, 80)}
+                        alt={cat.name}
+                        className="l2-mega-menu__cat-thumb"
+                      />
+                      <span className="l2-mega-menu__cat-name">{cat.name}</span>
+                      <span className="l2-mega-menu__side-arrow" aria-hidden="true">›</span>
+                    </a>
+                  ))}
                 </div>
               </div>
             )}
@@ -465,14 +416,29 @@ export function Header() {
                     {isExpanded && cat.subcategories.length > 0 && (
                       <div className="l2-mobile-subcat-list">
                         {cat.subcategories.map((sub) => (
-                          <a
-                            key={sub.slug}
-                            href={`/category/${sub.slug}`}
-                            className="l2-mobile-subcat-link"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            {sub.name}
-                          </a>
+                          <div key={sub.slug}>
+                            <a
+                              href={`/category/${sub.slug}`}
+                              className="l2-mobile-subcat-link"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              {sub.name}
+                            </a>
+                            {sub.subcategories && sub.subcategories.length > 0 && (
+                              <div className="l2-mobile-subcat-nested">
+                                {sub.subcategories.map((nested) => (
+                                  <a
+                                    key={nested.slug}
+                                    href={`/category/${nested.slug}`}
+                                    className="l2-mobile-subcat-link l2-mobile-subcat-link--nested"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                  >
+                                    ↳ {nested.name}
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}
